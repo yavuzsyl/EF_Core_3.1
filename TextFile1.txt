@@ -1,1 +1,8 @@
 #Azure Cosmos DB nosql documentation db from microsoft
+
+CHAPTER 2
+
+Nuget EfCore
+L:adding efcore sqlserver package will be enough because it contains other packages in it
+L:We have to add database provider to data project to enable efcore for dtabase we are using oracle,mssql,mysql,mongo etc.
+L:in efcore we have tot explicitly tell to context which sqlprovider and connection string we are using
