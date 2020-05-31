@@ -17,7 +17,7 @@ L:Powershell:.tools
   dotnet cli :tools.dotnet
   migration api: .design(insalled as a dependency of tools)
 
-C: get-help entityframework for usefull commands
+C: get-help entityframework for useful commands
 L: Migrations=> Snapshot.cs represents current state of model so when model has to change ef compares with this class and decides what needs to be change
 C: script-migration generates sql script for migration
 
