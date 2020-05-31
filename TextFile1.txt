@@ -1,8 +1,29 @@
 #Azure Cosmos DB nosql documentation db from microsoft
 
-CHAPTER 2
+CHAPTER:2---------------------------------
 
 Nuget EfCore
 L:adding efcore sqlserver package will be enough because it contains other packages in it
 L:We have to add database provider to data project to enable efcore for dtabase we are using oracle,mssql,mysql,mongo etc.
 L:in efcore we have tot explicitly tell to context which sqlprovider and connection string we are using
+
+CHAPTER:3----------------------------------
+
+MIGRATIONS
+
+Nuget Packages;
+	
+L:Powershell:.tools
+  dotnet cli :tools.dotnet
+  migration api: .design(insalled as a dependency of tools)
+
+C: get-help entityframework for usefull commands
+L: Migrations=> Snapshot.cs represents current state of model so when model has to change ef compares with this class and decides what needs to be change
+C: script-migration generates sql script for migration
+
+Recommendation of usage;
+for development environment use update-database
+for production environment use script-migration 
+
+C:update-database -verbose with -verbose we can see details of process
+
