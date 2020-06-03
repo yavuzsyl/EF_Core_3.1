@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SamuraiApp.Domain
 {
@@ -13,5 +15,8 @@ namespace SamuraiApp.Domain
         public string Name { get; set; }
         public List<Quote> Quotes { get; set; }
         public Clan Clan { get; set; }
+        public Horse Horse { get; set; }
+        public List<SamuraiBattle> BattlesFought { get; set; }
+
     }
 }

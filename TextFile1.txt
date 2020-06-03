@@ -29,3 +29,14 @@ C:update-database -verbose with -verbose we can see details of process
 
 Command for Db-First 
 C:scaffold-dbcontext -provider Microsoft.EntityFrameworkCore.SqlServer -connection "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SamuraiAppData;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+
+
+CHAPTER:4------------------------------------------
+L:Many to many , ef core doesnt generates join table automatically we have add join table and in the OnModelCreating method of context class we have to specify composite key(foreign keys for main tables) with using FluentApi
+
+L:One to One , one to one relation in ef core is always optional if we want to make it required we have to make it in our business logic
+
+L: We can target multiple frameweroks with "targetFrameworks"   <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
+
+L: If we dont write a classes dbset prop in context ef core doesnt generate table but if we write that class as a navigational property in any class written in as dbset in context class ef core generates table for that class , we can use this if we dont want to use Dbset for that class with this in Fluent api we can change default class name
+
