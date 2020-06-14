@@ -4,15 +4,16 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace SamuraiApp.Data
 {
-    public partial class SamuraiAppDataContext : DbContext
+    public partial class SamuraiAppDataNoTrackingContext : DbContext
     {
-        public SamuraiAppDataContext()
+        public SamuraiAppDataNoTrackingContext()
         {
         }
 
-        public SamuraiAppDataContext(DbContextOptions<SamuraiAppDataContext> options)
+        public SamuraiAppDataNoTrackingContext(DbContextOptions<SamuraiAppDataNoTrackingContext> options)
             : base(options)
         {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public virtual DbSet<Clans> Clans { get; set; }

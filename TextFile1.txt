@@ -32,11 +32,91 @@ C:scaffold-dbcontext -provider Microsoft.EntityFrameworkCore.SqlServer -connecti
 
 
 CHAPTER:4------------------------------------------
-L:Many to many , ef core doesnt generates join table automatically we have add join table and in the OnModelCreating method of context class we have to specify composite key(foreign keys for main tables) with using FluentApi
+L:Many to many , ef core doesnt generates join table automatically we have to add join table and in the OnModelCreating method of context class we have to specify composite key(foreign keys for main tables) with using FluentApi
 
 L:One to One , one to one relation in ef core is always optional if we want to make it required we have to make it in our business logic
 
 L: We can target multiple frameweroks with "targetFrameworks"   <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
 
-L: If we dont write a classes dbset prop in context ef core doesnt generate table but if we write that class as a navigational property in any class written in as dbset in context class ef core generates table for that class , we can use this if we dont want to use Dbset for that class with this in Fluent api we can change default class name
+L: If we dont write dbset prop for a class in context, ef core doesnt generate table but if we write that class as a navigational property in any class written in as dbset in context class ef core generates table for that class , we can use this if we dont want to use Dbset for that class with this in Fluent api we can change default class name
 
+
+CHAPTER:5---------------------------------------------
+
+L:with adding new entity to dbset prop context will start to tracking or "change tracking" this entity.Context does this with the internal entityEntry object
+EntityEntry object keep currentstate of object and other informations so context will know whats going on with entity.
+  var samurai = new Samurai { Name = "Sampson" };
+            context.Samurais.Add(samurai);
+			context.SaveChanges();
+L: with savechanges method ef core will map the new or edited objects to sql with using sql provider and receives the mapping result to SQL
+L: savechanges works with transaction. when savechanegs calls more than 1 command to excute if one of them fails savechanges will roll back transactions so nothing will be changed 
+
+
+D:6/14
+L:EF core supports bulk operation addrange(list)  , addrange(obj1,obj2) | ef core hase threshold operations value to execute batch insert and it is 4 operation cuz less then 4 it is faster to insert as single 
+L:@@ROWCOUNT returns the number of rows affected by the last statement | SCOPE_IDENTITY() returns the last identity value inserted into identity column in the same scope
+
+L:ALSO we can use addrange to add different typed objects with context  context.addrange(type1obj,type2obj)
+L:.UseSqlServer("Data Source =(localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData", options => options.MaxBatchSize(150)); WE CAN Configure max batch size
+
+L:EF Query workflow ex;
+context.samurais.ToList(); => with tolist ef core executes the query => ef reads model works with provider and sends sql query to database => receives result => materializes results as objects => adds tracking details to dbocntext object instance for each entity
+L: there are to ways to express linq queries:
+1.linq-methods context.samurais.ToList();
+2.linq-query syntax (from s in samurais select s).ToList() 1 is much practical 
+
+L: db connection remains open during enumaration so if there are lots of work for each result connection stays open until last result is fetched and thats not good it can block other users to reach data , best way is the get all data with tolist one time and then iterate  
+
+L:s:object | =>:lambda operator | s.Name == "samspon":expression
+L: if we send value as parameter to linq method ef core will parameterize it in sql
+var samurai = context.Samurais.FirstOrDefault(s => s.Name == name);
+but if we send directly the value it will hard coded in sql i think parameterizing is way better cuz ef core will cache the query
+L:with .EnableSensitiveDataLogging(true) in dbcontext.onconfiguring() method we are saying that show sensitive data in logging like parameter values that sending to database 
+L:  var filter = "J%";
+var samurai2 = context.Samurais.Where(samurai=> EF.Functions.Like(samurai.Name,filter)).ToList();
+new feature EF.Functions.Like(expression) we can use this instead of contains cuz in the end contains converted to this
+L: Find(key) : if the entity with the given key tracking by context it returns the entity without going to database else it requests to database with the given primary keys and returns entity or null due to its existince and find method is not a linq method but a dbset method
+
+Aggreagating in Querries
+L:LINQ TO ENTITIES EXECUTION methods
+ToList()
+First()
+FirstOrDefault()
+Single()
+SingleOrDefault()
+Last()*
+LastOrDefault()*
+Count()
+LongCount()
+Min(), Max()
+Average(), Sum()
+ToListAsync()
+FirstAsync()
+FirstOrDefaultAsync()
+SingleAsync()
+SingleOrDefaultAsync()
+LastAsync()*
+LastOrDefaultAsync()*
+CountAsync()
+LongCountAsync()
+MinAsync(), MaxAsync()
+AverageAsync(), SumAsync()
+AsAsyncEnumerable**
+L:Find(primary key) it executes immidiately  looks for entity in context it it s tracked by context returns it else goes db 
+so if we have primary key we should use find 
+L:*Last methods require query to have an OrderBy() method otherwise will return full set then pick last in memory or throws exception so use it with orderby 
+**New to EF Core 3 with C#8 support
+L:First ,Single ... methods like these(has default version of itself) throws exception if expression doesnt match 
+single entity returning methods selects top1
+
+Updating Simple Objects 
+L:Since db context tracks the entity-entities when retrieved from database entity.entry object knows the state of entity(updated or deleted) if we call savechanges method without using update method entity will be updated 
+L:OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY-SQL | Skip(10).Take(10)-LINQ Methods
+L: again the batch execution threshold is 4 operations 
+L: Update - UpdateRange with+(context.UpdateRange)
+
+Removing Simple Objects 
+L:Remove - RemoveRange with+(context.RemoveRange)
+
+Persisting Data in Disconnected Scenarios
+L:

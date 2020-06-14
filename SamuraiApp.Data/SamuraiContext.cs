@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SamuraiApp.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace SamuraiApp.Data
 {
@@ -15,11 +14,28 @@ namespace SamuraiApp.Data
         public DbSet<Battle> Battles { get; set; }
         public DbSet<SamuraiBattle> SamuraiBattles { get; set; }
 
+
+        public static readonly ILoggerFactory ConsoleLogFactory
+            = LoggerFactory.Create(builder =>
+            {
+                builder.
+                    AddFilter((category, level) =>
+                        category == DbLoggerCategory.Database.Command.Name
+                        && level == LogLevel.Information)
+                    .AddConsole();
+                    
+            });
+
+
         //the first time efcore instantiate samuraicontext class it will trigger this method
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source =(localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData");
+            optionsBuilder
+                .UseLoggerFactory(ConsoleLogFactory)//LOGGER factory will log every time context called?
+                .EnableSensitiveDataLogging(true)
+                .UseSqlServer("Data Source =(localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData", options => options.MaxBatchSize(150));
         }
+
 
         protected override void OnModelCreating(ModelBuilder mb)
         {
