@@ -1,5 +1,5 @@
 #Azure Cosmos DB nosql documentation db from microsoft
-
+https://code-maze.com/entity-framework-core-series/
 CHAPTER:2---------------------------------
 
 Nuget EfCore
@@ -77,7 +77,7 @@ var samurai2 = context.Samurais.Where(samurai=> EF.Functions.Like(samurai.Name,f
 new feature EF.Functions.Like(expression) we can use this instead of contains cuz in the end contains converted to this
 L: Find(key) : if the entity with the given key tracking by context it returns the entity without going to database else it requests to database with the given primary keys and returns entity or null due to its existince and find method is not a linq method but a dbset method
 
-Aggreagating in Querries
+Aggreagating in Queries
 L:LINQ TO ENTITIES EXECUTION methods
 ToList()
 First()
@@ -119,4 +119,115 @@ Removing Simple Objects
 L:Remove - RemoveRange with+(context.RemoveRange)
 
 Persisting Data in Disconnected Scenarios
-L:
+L:w AsNoTracking context retrieves entity wout tracking it & with new context instance using update method will start tracking the given entity and thus that newcontext didnt retrieve that entity from database it doesnt know the history of it so wehen savechanegs called it will send all of entity properties to update 
+L:if we go on one context it will send only the id and changed value to update  but in real world applications mostly it works with more then one context instance so it will be hard to tack entity all time so we can use Update method to track entity end savechange
+
+Enhancing Performance in Disconnected Apps with No-Tracking settings
+L:Query level no tracking .AsNoTracking() method we cant use Find method after AsNoTracking() method 
+L:Context level we can specify instance level we will see later and constructor level ChangeTracker.QueryTrackingBehavior ...
+
+CHAPTER 6
+
+Inserting Related Data 
+L:insert 
+//InserNewSamuraiWithAQuote();
+//InserNewSamuraiWithManyQuote();
+//AddQuoteToExistingSamuraiWhileTracked();
+//AddQuoteToExistingSamuraiWhileNotTracked(5);
+//AddQuoteToExistingSamuraiWhileNotTrackedEasy(5);
+
+Eager Loading Related Data
+L:Include related objects in query
+_context.Samurais
+.Include(s => s.Quotes)
+.ThenInclude(q=>q.Translations)
+.FirstOrDefault();
+
+t Get quotes for the samurai
+t Then get the translations for those
+quotes
+
+_context.Samurais
+.Include(s => s.Quotes)
+.Include(s=>s.Clan)
+.FirstOrDefault();
+
+t Get quotes for samurais
+t Also get the clan for samurais
+
+
+Projecting Related Data in Queries
+L:.Select(x=> new {x.Name , x.Quotes});
+L: Project edilen alanlara göre ortaya çıkan yeni anonymous modelde propertiler arasında dbset entitie si varsa onlar track edilir diğerleri edilmez
+context.ChangeTracker.Entries(), results with quick watch we can see which entities tracked
+L: SQL SELECT Name,Id From users , Select(x=> new NameIdModel{Name=x.name, Id = x.Id  })
+
+D:6/16 midnight 17
+
+Loading Related Data in Queries
+
+Explicit Loading (-Load()-): explicitly retrieve related data for objects already in memory
+L:context.Entry(samurai).Collection(s=> s.Quotes).Load();
+context.Entry(samurai).Reference(s=> s.Horse).Load();
+L:We can only load from a single object  - we can use another linq query instead of iterating list of entities
+(-Query()-)
+L:Also we can filter loaded data using the QUERY method - which we cant do with eager Loading
+context.Entry(samurai)
+.Collection(s=> s.Quotes)
+.Query
+Where(q=> q.Quote.Contains("wECK".ToLower()))
+.ToList();
+
+
+Lazy Loading(implicitly loading) : another way to retrieve related data for objects already in memory
+L:Lazy loading is off by default
+L:just use  navigation object to retrieve data 
+How to enable ? :
+1.Every navigation property must be virtual
+2.EntityFramework.Proxies package
+3.ModelBuilder.UserLazyLoadingProxies()
+
+
+Using Related Data To Filter Ojects 
+.Where(s=> s.Quotes.Any(q => q.name.Contains("sam")))
+
+Modifying Related Data
+L:ModifyingRelatedDataWhenTracked is easy it just updates changed data 
+L:ModifyingRelatedDataWhenNotTracked is complicated it updates all related data with parent object even they are not changed
+to solve this ef core has context.Entry(quote).state = EntityState.Modified   method will just update given object
+
+Entity Framework Core 2 : Mappings -Advanced  Courses
+
+Creating and Changing Many to Many Relationships
+L: adding new object to join table var sbjoin = new SamuraiBattle { SamuraiId = 1, BattleId = 1 };
+context.SamuraiBattles.Add(sbjoin);//if we dont have db set of join table just use context.Add(sbjoin)
+context.SaveChanges(); 
+L: adding var battle = context.Battles.FirstOrDefault();
+battle.SamuraisInBattles
+    .Add(new SamuraiBattle { SamuraiId = 2 });//do not need to specify battle id because of context tracks battle
+context.SaveChanges();
+
+Querying Across many to many 
+L:GetSamuraiWithBattles
+
+
+D:6/17 midnight 18
+
+Persisting Data in One-to-One Relationships
+L:   //AddNewSamuraiWithHorse(); new samurai with new horse add context
+//AddNewHorseToSamuraiUsingSamuraiId(); new horse using samurai id & add horse to context
+//AddNewHorseToSamuraiInMemory(); get samurai  samurai.horse = new Horse & context save changes
+//AddNewHorseToDisconnectedSamuraiInMemory(); get samurai tracked samurai.horse = new horse , new context attach samurai to context instead of update because update will update not changed samurai but attach will flag samurai entity-state to unchanged will only insert horse 
+//ReplaceAHorse();//get samurai  samurai.horse = new Horse & context save changes
+Changing the Child Of an Existing Parent 
+Is foreign key nullable
+is the child object in memory if not will throw exception
+are the objects being tracked
+
+Querying One-to-One Relationships
+L:if db set not exist use context.Set<Type>().ToList();
+
+Working with a Relationship that has minimal properties
+clan --->Samurais 
+clan.cs doesnt have collection of samurais and samurai.cs doesnt have Clan foreign key only navigation prop of Clan
+L: go on navigation property 

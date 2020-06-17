@@ -11,7 +11,7 @@ namespace SamuraiApp.Domain
         public int SamuraiId { get; set; }
 
         //optional
-        public Battle Battle { get; set; }
-        public Samurai Samurai { get; set; }
+        public virtual Battle Battle { get; set; }
+        public virtual Samurai Samurai { get; set; }
     }
 }

@@ -11,6 +11,6 @@ namespace SamuraiApp.Domain
         public string Name { get; set; }
         [ForeignKey(nameof(Samurai))]
         public int SamuraiId { get; set; }
-        public Samurai Samurai { get; set; }
+        public virtual Samurai Samurai { get; set; }
     }
 }

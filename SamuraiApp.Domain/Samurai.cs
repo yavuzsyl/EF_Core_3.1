@@ -10,13 +10,14 @@ namespace SamuraiApp.Domain
         public Samurai()
         {
             Quotes = new List<Quote>();
+
         }
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<Quote> Quotes { get; set; }
-        public Clan Clan { get; set; }
-        public Horse Horse { get; set; }
-        public List<SamuraiBattle> BattlesFought { get; set; }
+        public virtual List<Quote> Quotes { get; set; }
+        public virtual Clan Clan { get; set; }
+        public virtual Horse Horse { get; set; }
+        public virtual List<SamuraiBattle> BattlesFought { get; set; }
 
     }
 }

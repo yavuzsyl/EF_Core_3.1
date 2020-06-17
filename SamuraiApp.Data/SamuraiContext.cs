@@ -33,6 +33,7 @@ namespace SamuraiApp.Data
             optionsBuilder
                 .UseLoggerFactory(ConsoleLogFactory)//LOGGER factory will log every time context called?
                 .EnableSensitiveDataLogging(true)
+                .UseLazyLoadingProxies()
                 .UseSqlServer("Data Source =(localdb)\\MSSQLLocalDB; Initial Catalog = SamuraiAppData", options => options.MaxBatchSize(150));
         }
 
