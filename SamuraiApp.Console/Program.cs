@@ -49,7 +49,7 @@ namespace ConsoleApp
             //JoinBattleAndSamurai();
             //EnlistSamuraiIntoABattle();
 
-            //GetSamuraiWithBattles();
+            GetSamuraiWithBattles();
 
             //AddNewSamuraiWithHorse();
             //AddNewHorseToSamuraiUsingSamuraiId();
@@ -57,14 +57,55 @@ namespace ConsoleApp
             //AddNewHorseToDisconnectedSamuraiInMemory();
             //ReplaceAHorse();
 
-            //GetSamuraisWithHorse();
-            //GetHorseWithSamurai();
+            GetSamuraisWithHorse();
+            GetHorseWithSamurai();
 
             GetSamuraisWithClans();
             GetClanWithSamurais();
 
+            QuerySamuraiBattleStats();
+
+            //QueryUsingRawSql();
+            //QueryUsingRawSqlStoredProc();
+
+            //NonQueryRawSql();
+
             Console.Write("Press any key...");
             Console.ReadKey();
+        }
+
+        private static void NonQueryRawSql()
+        {
+            var affectedRows = context.Database.ExecuteSqlRaw("EXEC DeleteQuotesForSamurai {0}", 2);
+            Console.WriteLine(affectedRows);
+        }
+
+        private static void QueryUsingRawSqlStoredProc()
+        {
+            var samurais = context.Samurais.FromSqlRaw("EXEC dbo.SamuraisWhoSaidAWord {0}", "happy").ToList();
+
+            Console.WriteLine();
+        }
+
+        private static void QueryUsingRawSql()
+        {
+            var samurais = context.Samurais.FromSqlRaw("SELECT *FROM Samurais").ToList();
+            var samurais2 = context.Samurais.FromSqlRaw("SELECT *FROM Samurais").Include(s=> s.Quotes).ToList();
+            var samurais3 = context.Samurais.FromSqlRaw($"SELECT *FROM Samurais WHERE Name = '{"Sam"}'").ToList();//open to sql injection not parameterized
+            var samurais4 = context.Samurais.FromSqlInterpolated($"SELECT *FROM Samurais WHERE Name = {"Sam"}").ToList();
+
+            Console.WriteLine();
+
+        }
+
+        private static void QuerySamuraiBattleStats()
+        {
+            var battleStats = context.SamuraiBattleStats.ToList();
+            var battleStats1 = context.SamuraiBattleStats.FirstOrDefault();
+            var battleStats2 = context.SamuraiBattleStats.Where(sbs => sbs.Name == "SampsonSan");
+            var battleStats3 = context.SamuraiBattleStats.Find(2);//wont work even the find method of dbset seems will work but in run time wont because change tracker wont track keyless entities
+
+            Console.WriteLine();
         }
 
         private static void GetClanWithSamurais()

@@ -13,7 +13,7 @@ namespace SamuraiApp.Data
         public DbSet<Clan> Clans { get; set; }
         public DbSet<Battle> Battles { get; set; }
         public DbSet<SamuraiBattle> SamuraiBattles { get; set; }
-
+        public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
         public static readonly ILoggerFactory ConsoleLogFactory
             = LoggerFactory.Create(builder =>
@@ -43,6 +43,7 @@ namespace SamuraiApp.Data
             mb.Entity<SamuraiBattle>().HasKey(x => new { x.BattleId, x.SamuraiId });//composite key
             mb.Entity<Samurai>().HasOne(x => x.Horse).WithOne(x => x.Samurai).IsRequired(true);
             mb.Entity<Horse>().ToTable("Horses");
+            mb.Entity<SamuraiBattleStat>().HasNoKey().ToView("SamuraiBattleStats");
                             
         }
     }
